@@ -1,0 +1,12 @@
+PODS:
+  - fishhook (0.2)
+
+DEPENDENCIES:
+  - fishhook
+
+SPEC CHECKSUMS:
+  fishhook: ea19933abfe8f2f52c55fd8b6e2718467d3ebc89
+
+PODFILE CHECKSUM: ad1fb4b2979cbc3a8fe90a22c840ab02e8a87612
+
+COCOAPODS: 1.1.1
