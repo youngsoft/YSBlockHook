@@ -14,7 +14,6 @@
 #import <objc/runtime.h>
 #import "fishhook.h"
 
-#ifdef __arm64__
 
 extern const struct mach_header* _NSGetMachExecuteHeader(void);
 
@@ -48,8 +47,9 @@ struct Block_layout {
 };
 
 
-//声明统一的block的hook函数，这个函数的定义是用汇编代码来实现，具体实现在blockhook-arm64.s中。
+//声明统一的block的hook函数，这个函数的定义是用汇编代码来实现，具体实现在blockhook-arm64.s/blockhook-x86_64.s中。
 extern void blockhook(void);
+extern void blockhook_stret(void);
 
 
 
@@ -57,9 +57,8 @@ extern void blockhook(void);
  替换block对象的默认invoke实现
 
  @param blockObj block对象
- @param newFunction 统一的hook函数实现
  */
-void replaceBlockInvokeFunction(const void *blockObj, void *newFunction)
+void replaceBlockInvokeFunction(const void *blockObj)
 {
     //任何一个block对象都可以转化为一个struct Block_layout结构体。
     struct Block_layout *layout = (struct Block_layout*)blockObj;
@@ -73,8 +72,13 @@ void replaceBlockInvokeFunction(const void *blockObj, void *newFunction)
         if (invokePos > imageTextStart && invokePos < imageTextEnd)
         {
             //将默认的invoke实现保存到保留字段，将统一的hook函数赋值给invoke成员。
-            layout->descriptor->reserved = layout->invoke;
-            layout->invoke = newFunction;
+            int32_t BLOCK_USE_STRET = (1 << 29);  //如果模拟器下返回的类型是一个大于16字节的结构体，那么block的第一个参数为返回的指针，而不是block对象。
+            void *hookfunc = ((layout->flags & BLOCK_USE_STRET) == BLOCK_USE_STRET) ? blockhook_stret : blockhook;
+            if (layout->invoke != hookfunc)
+            {
+                layout->descriptor->reserved = layout->invoke;
+                layout->invoke = hookfunc;
+            }
         }
     }
     
@@ -87,14 +91,14 @@ void replaceBlockInvokeFunction(const void *blockObj, void *newFunction)
 void *(*__NSStackBlock_retain_old)(void *obj, SEL cmd) = NULL;
 void *__NSStackBlock_retain_new(void *obj, SEL cmd)
 {
-    replaceBlockInvokeFunction(obj, blockhook);
+    replaceBlockInvokeFunction(obj);
     return __NSStackBlock_retain_old(obj, cmd);
 }
 
 void *(*__NSMallocBlock_retain_old)(void *obj, SEL cmd) = NULL;
 void *__NSMallocBlock_retain_new(void *obj, SEL cmd)
 {
-    replaceBlockInvokeFunction(obj, blockhook);
+    replaceBlockInvokeFunction(obj);
     return __NSMallocBlock_retain_old(obj, cmd);
 }
 
@@ -102,7 +106,7 @@ void *__NSMallocBlock_retain_new(void *obj, SEL cmd)
 void *(*__NSGlobalBlock_retain_old)(void *obj, SEL cmd) = NULL;
 void *__NSGlobalBlock_retain_new(void *obj, SEL cmd)
 {
-    replaceBlockInvokeFunction(obj, blockhook);
+    replaceBlockInvokeFunction(obj);
     return __NSGlobalBlock_retain_old(obj, cmd);
 }
 
@@ -110,14 +114,14 @@ void *__NSGlobalBlock_retain_new(void *obj, SEL cmd)
 void* (*_Block_copy_old)(const void *aBlock);
 void *_Block_copy_new(const void *aBlock)
 {
-    replaceBlockInvokeFunction(aBlock, blockhook);
+    replaceBlockInvokeFunction(aBlock);
     return _Block_copy_old(aBlock);
 }
 
 void* (*objc_retainBlock_old)(const void *aBlock);
 void *objc_retainBlock_new(const void *aBlock)
 {
-    replaceBlockInvokeFunction(aBlock, blockhook);
+    replaceBlockInvokeFunction(aBlock);
     return objc_retainBlock_old(aBlock);
 }
 
@@ -136,7 +140,6 @@ void blockhookLog(void *blockObj)
     }
 }
 
-#endif
 
 @interface ViewController ()
 
@@ -154,9 +157,6 @@ void blockhookLog(void *blockObj)
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
-    //目前只支持在arm64位的真机上hook处理，不支持模拟器的原因是有可能在模拟器中某个Block返回的是一个结构体，这样Block的实现函数的第一个参数将
-    //不再是block对象本身，而是返回的结构体的指针。而这些无法在汇编代码中进行区分！
-#ifdef __arm64__
     //初始化并计算可执行程序代码段和数据段的开始和结束位置。
     initImageTextStartAndEndPos();
     
@@ -175,14 +175,15 @@ void blockhookLog(void *blockObj)
     msg[1].replaced = (void**)&objc_retainBlock_old;
     rebind_symbols(msg, 2);
 
-#endif
     //下面是实例代码。
     int a = 10;
     
     //global block
-    void (^testblock1)(void) = ^()
+    struct Block_layout (^testblock1)(void) = ^()
     {
         NSLog(@"This is a Global block");
+        
+        return (struct Block_layout){0,0,0,0,0};
     };
     testblock1();
     
@@ -200,6 +201,14 @@ void blockhookLog(void *blockObj)
         NSLog(@"This is a Stack block:%d",a);
     }];
     
+    //结构体返回测试
+    struct Block_layout (^testblock3)(void) = ^()
+    {
+        NSLog(@"This is a Global block for stret");
+        
+        return (struct Block_layout){0,0,0,0,0};
+    };
+    testblock3();
     
     //C语言block
     dispatch_async(dispatch_get_main_queue(), ^{

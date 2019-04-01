@@ -12,7 +12,7 @@
 .macro ENTRY /* name */
 .text
 .align 5
-.globl    $0
+.private_extern    $0
 $0:
 .endmacro
 
@@ -22,6 +22,7 @@ LExit$0:
 .endmacro
 
 
+// void blockhook(...);
 ENTRY _blockhook
 
 stp q6, q7, [sp, #-0x20]!
@@ -34,7 +35,7 @@ stp x2, x3, [sp, #-0x10]!
 stp x0, x1, [sp, #-0x10]!
 stp x8, x30, [sp, #-0x10]!
 
-//执行函数
+//执行日志打印函数。
 bl _blockhookLog
 
 ldp x8, x30, [sp], #0x10
@@ -52,5 +53,10 @@ ldr x16, [x16]
 br x16
 
 END_ENTRY _blockhook
+
+// void blockhook_stret(...);
+ENTRY _blockhook_stret
+b _blockhook
+END_ENTRY _blockhook_stret
 
 #endif

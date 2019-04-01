@@ -14,6 +14,7 @@
 		205FC354224DD1A70050ED77 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 205FC353224DD1A70050ED77 /* Assets.xcassets */; };
 		205FC357224DD1A70050ED77 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 205FC355224DD1A70050ED77 /* LaunchScreen.storyboard */; };
 		205FC35A224DD1A70050ED77 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 205FC359224DD1A70050ED77 /* main.m */; };
+		20EF48D6225232DE0012799A /* blockhook-x86_64.s in Sources */ = {isa = PBXBuildFile; fileRef = 20EF48D5225232DE0012799A /* blockhook-x86_64.s */; };
 		FADA1956BC082AF9509A9D62 /* libPods-YSBlockHook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2E30DC914E23E85F9C088240 /* libPods-YSBlockHook.a */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,7 @@
 		205FC356224DD1A70050ED77 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		205FC358224DD1A70050ED77 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		205FC359224DD1A70050ED77 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		20EF48D5225232DE0012799A /* blockhook-x86_64.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = "blockhook-x86_64.s"; sourceTree = "<group>"; };
 		2E30DC914E23E85F9C088240 /* libPods-YSBlockHook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-YSBlockHook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8668B7643E4A229FB7508F3D /* Pods-YSBlockHook.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YSBlockHook.release.xcconfig"; path = "Pods/Target Support Files/Pods-YSBlockHook/Pods-YSBlockHook.release.xcconfig"; sourceTree = "<group>"; };
 		8C3ABF410BCC27E2596A3544 /* Pods-YSBlockHook.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YSBlockHook.debug.xcconfig"; path = "Pods/Target Support Files/Pods-YSBlockHook/Pods-YSBlockHook.debug.xcconfig"; sourceTree = "<group>"; };
@@ -68,6 +70,7 @@
 			isa = PBXGroup;
 			children = (
 				200B4067224DD3EC00F52BE7 /* blockhook-arm64.s */,
+				20EF48D5225232DE0012799A /* blockhook-x86_64.s */,
 				205FC34A224DD1A40050ED77 /* AppDelegate.h */,
 				205FC34B224DD1A40050ED77 /* AppDelegate.m */,
 				205FC34D224DD1A40050ED77 /* ViewController.h */,
@@ -231,6 +234,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20EF48D6225232DE0012799A /* blockhook-x86_64.s in Sources */,
 				205FC34F224DD1A40050ED77 /* ViewController.m in Sources */,
 				200B4069224DD3EC00F52BE7 /* blockhook-arm64.s in Sources */,
 				205FC35A224DD1A70050ED77 /* main.m in Sources */,
