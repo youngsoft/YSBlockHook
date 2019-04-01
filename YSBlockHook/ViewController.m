@@ -14,6 +14,8 @@
 #import <objc/runtime.h>
 #import "fishhook.h"
 
+#ifdef __arm64__
+
 extern const struct mach_header* _NSGetMachExecuteHeader(void);
 
 //这两个全局变量保存可执行程序的代码段+数据段的开始和结束位置。
@@ -134,7 +136,7 @@ void blockhookLog(void *blockObj)
     }
 }
 
-
+#endif
 
 @interface ViewController ()
 
