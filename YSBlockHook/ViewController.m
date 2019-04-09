@@ -179,11 +179,9 @@ void blockhookLog(void *blockObj)
     int a = 10;
     
     //global block
-    struct Block_layout (^testblock1)(void) = ^()
+    void (^testblock1)(void) = ^()
     {
         NSLog(@"This is a Global block");
-        
-        return (struct Block_layout){0,0,0,0,0};
     };
     testblock1();
     
