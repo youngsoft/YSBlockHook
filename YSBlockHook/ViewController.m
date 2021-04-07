@@ -161,9 +161,9 @@ void blockhookLog(void *blockObj)
     initImageTextStartAndEndPos();
     
     //这里采用Method Swizzling的机制来替换掉三个类的原始retain实现。
-    __NSStackBlock_retain_old =(void *(*)(void*,SEL))class_replaceMethod(NSClassFromString(@"__NSStackBlock"), sel_registerName("retain"), (IMP)__NSStackBlock_retain_new, nil);
-    __NSMallocBlock_retain_old = (void *(*)(void*,SEL))class_replaceMethod(NSClassFromString(@"__NSMallocBlock"), sel_registerName("retain"), (IMP)__NSMallocBlock_retain_new, nil);
-    __NSGlobalBlock_retain_old = (void *(*)(void*,SEL))class_replaceMethod(NSClassFromString(@"__NSGlobalBlock"), sel_registerName("retain"), (IMP)__NSGlobalBlock_retain_new, nil);
+    __NSStackBlock_retain_old =(void *(*)(void*,SEL))class_replaceMethod(NSClassFromString(@"__NSStackBlock__"), sel_registerName("retain"), (IMP)__NSStackBlock_retain_new, nil);
+    __NSMallocBlock_retain_old = (void *(*)(void*,SEL))class_replaceMethod(NSClassFromString(@"__NSMallocBlock__"), sel_registerName("retain"), (IMP)__NSMallocBlock_retain_new, nil);
+    __NSGlobalBlock_retain_old = (void *(*)(void*,SEL))class_replaceMethod(NSClassFromString(@"__NSGlobalBlock__"), sel_registerName("retain"), (IMP)__NSGlobalBlock_retain_new, nil);
     
     //这里借助fishhook提供的方法来实现动态库中导出的C函数__Block_copy的替换，你也可以添加对objc_retainBlock函数的替换处理
     struct rebinding msg[2];
